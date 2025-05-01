@@ -53,7 +53,25 @@ else:
 
 # ------------------------ EDICIÓN DE DATOS ------------------------ #
 st.header("1. Cargar o editar tus actividades")
-if usuario:
+
+# Botón para que el usuario cargue su propio archivo Input2.xlsx desde su PC 30-4
+uploaded_file = st.file_uploader("O subí tu archivo Input2 desde tu PC", type=["xlsx"])
+archivo_valido = True  # Bandera para controlar si se debe mostrar el editor
+
+if uploaded_file is not None and usuario:
+    try:
+        if usuario.lower() in uploaded_file.name.lower():
+            df_uploaded = pd.read_excel(uploaded_file)
+            df_uploaded.to_excel(file_input2, index=False)
+            st.success("Archivo Input2 subido correctamente y guardado.")
+            df = df_uploaded
+        else:
+            archivo_valido = False
+            st.error("El archivo subido no corresponde al usuario ingresado.")
+    except Exception as e:
+        archivo_valido = False
+        st.error(f"Error al leer el archivo subido: {e}")
+if usuario and archivo_valido:
     df_editado = st.data_editor(df, num_rows="dynamic", use_container_width=True)
 
     if st.button("Guardar Input2 actualizado"):
